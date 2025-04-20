@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: Ledger Lux Backend
+logging:
+  level:
+    root: INFO
+    dev.prithwish: DEBUG
+    javax.management.remote: WARN
+    sun.rmi: WARN

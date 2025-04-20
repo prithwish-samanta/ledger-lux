@@ -1,0 +1,16 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb://admin:secret123@localhost:27017/ledgerlux_dev?authSource=admin
+
+jwt:
+  public:
+    key: classpath:/dev/app.pub
+  private:
+    key: classpath:/dev/app.key
+  access-token:
+    expiration:
+      time: 28800000
+  refresh-token:
+    expiration:
+      time: 604800000

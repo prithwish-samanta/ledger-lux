@@ -1,0 +1,16 @@
+spring:
+  data:
+    mongodb:
+      uri: <prod_mongo_db_url>
+
+jwt:
+  public:
+    key: classpath:/prod/app.pub
+  private:
+    key: classpath:/prod/app.key
+  access-token:
+    expiration:
+      time: 28800000
+  refresh-token:
+    expiration:
+      time: 604800000
