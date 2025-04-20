@@ -37,6 +37,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public TransactionResponse getTransaction(String userId, String transactionId) {
         Transaction transaction = txnRepo.findById(transactionId)
+                .filter(r -> r.getUserId().equals(userId))
                 .orElseThrow(() -> new ResourceNotFoundException(DEFAULT_TRANSACTION_NOT_FOUND_MSG + transactionId));
         return mapper.toResponse(transaction);
     }
@@ -53,6 +54,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public TransactionResponse updateTransaction(String userId, String transactionId, TransactionRequest request) {
         Transaction txn = txnRepo.findById(transactionId)
+                .filter(r -> r.getUserId().equals(userId))
                 .orElseThrow(() -> new ResourceNotFoundException(DEFAULT_TRANSACTION_NOT_FOUND_MSG + transactionId));
         txn.setDate(request.date());
         txn.setAmount(request.amount());
@@ -67,6 +69,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public void deleteTransaction(String userId, String transactionId) {
         txnRepo.findById(transactionId)
+                .filter(r -> r.getUserId().equals(userId))
                 .orElseThrow(() -> new ResourceNotFoundException(DEFAULT_TRANSACTION_NOT_FOUND_MSG + transactionId));
         txnRepo.deleteById(transactionId);
     }
