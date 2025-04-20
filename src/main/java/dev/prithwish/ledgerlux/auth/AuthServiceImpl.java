@@ -9,7 +9,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -79,7 +78,7 @@ public class AuthServiceImpl implements AuthService {
                 .authenticate(new UsernamePasswordAuthenticationToken(req.email(), req.password()));
         SecurityContextHolder.getContext().setAuthentication(authenticate);
         String jwtToken = jwtProvider.generateAccessToken(authenticate);
-        String refreshToken = jwtProvider.generateRefreshToken(req.email());
+        String refreshToken = jwtProvider.generateRefreshToken(authenticate);
         return new AuthResponse(jwtToken, refreshToken, jwtProvider.getAccessTokenExpirationTime());
     }
 
@@ -89,12 +88,13 @@ public class AuthServiceImpl implements AuthService {
             throw new AuthTokenExpiredException("Refresh token has expired");
         }
         String username = jwtProvider.extractSubject(refreshToken);
-        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        CustomUserDetails user = (CustomUserDetails) userDetailsService.loadUserByUsername(username);
         Authentication authentication = new UsernamePasswordAuthenticationToken(
-                userDetails, null, userDetails.getAuthorities());
+                user, null, user.getAuthorities()
+        );
 
         String newAccessToken = jwtProvider.generateAccessToken(authentication);
-        String newRefreshToken = jwtProvider.generateRefreshToken(username);
+        String newRefreshToken = jwtProvider.generateRefreshToken(authentication);
 
         return new AuthResponse(newAccessToken, newRefreshToken, jwtProvider.getAccessTokenExpirationTime());
     }

@@ -14,8 +14,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserProfileDto getProfile(String username) {
-        User user = userRepo.findByEmail(username).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+    public UserProfileDto getProfile(String userId) {
+        User user = userRepo.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
         return new UserProfileDto(
                 user.getId(),
                 user.getEmail(),
@@ -27,9 +27,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserProfileDto updateProfile(String username, UserProfileDto dto) {
+    public UserProfileDto updateProfile(String userId, UserProfileDto dto) {
         // Find existing user
-        User user = userRepo.findByEmail(username)
+        User user = userRepo.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         // Update fields
         user.setDisplayName(dto.displayName());

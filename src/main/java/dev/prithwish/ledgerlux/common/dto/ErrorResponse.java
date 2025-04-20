@@ -1,4 +1,4 @@
-package dev.prithwish.ledgerlux.common.advice;
+package dev.prithwish.ledgerlux.common.dto;
 
 import java.time.Instant;
 

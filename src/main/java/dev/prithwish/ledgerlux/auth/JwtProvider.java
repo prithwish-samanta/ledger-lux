@@ -3,7 +3,6 @@ package dev.prithwish.ledgerlux.auth;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.stereotype.Service;
 
@@ -30,13 +29,14 @@ public class JwtProvider {
     }
 
     public String generateAccessToken(Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
+        CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
         GrantedAuthority authority = user.getAuthorities().iterator().next();
-        return generateTokenWithUsername(user.getUsername(), authority.getAuthority(), accessTokenExpirationTime);
+        return generateTokenWithUsername(user.getUsername(), user.getId(), authority.getAuthority(), accessTokenExpirationTime);
     }
 
-    public String generateRefreshToken(String username) {
-        return generateTokenWithUsername(username, "REFRESH_TOKEN", refreshTokenExpirationTime);
+    public String generateRefreshToken(Authentication authentication) {
+        CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
+        return generateTokenWithUsername(user.getUsername(), user.getId(), "REFRESH_TOKEN", refreshTokenExpirationTime);
     }
 
     public String extractSubject(String token) {
@@ -50,13 +50,15 @@ public class JwtProvider {
         return expiresAt != null && expiresAt.isBefore(Instant.now());
     }
 
-    private String generateTokenWithUsername(String username, String role, long expirationTime) {
+    private String generateTokenWithUsername(String username, String userId, String role, long expirationTime) {
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer("self")
                 .issuedAt(Instant.now())
                 .expiresAt(Instant.now().plus(Duration.ofMillis(expirationTime)))
                 .subject(username)
-                .claim("scope", role).build();
+                .claim("user_id", userId)
+                .claim("scope", role)
+                .build();
         return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
     }
 }

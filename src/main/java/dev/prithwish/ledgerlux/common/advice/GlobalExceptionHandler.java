@@ -1,5 +1,6 @@
 package dev.prithwish.ledgerlux.common.advice;
 
+import dev.prithwish.ledgerlux.common.dto.ErrorResponse;
 import dev.prithwish.ledgerlux.common.exception.AuthTokenExpiredException;
 import dev.prithwish.ledgerlux.common.exception.EmailAlreadyPresentException;
 import dev.prithwish.ledgerlux.common.exception.ResourceNotFoundException;
