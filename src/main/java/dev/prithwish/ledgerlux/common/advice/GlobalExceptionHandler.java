@@ -2,7 +2,7 @@ package dev.prithwish.ledgerlux.common.advice;
 
 import dev.prithwish.ledgerlux.common.dto.ErrorResponse;
 import dev.prithwish.ledgerlux.common.exception.AuthTokenExpiredException;
-import dev.prithwish.ledgerlux.common.exception.EmailAlreadyPresentException;
+import dev.prithwish.ledgerlux.common.exception.ResourceAlreadyPresentException;
 import dev.prithwish.ledgerlux.common.exception.ResourceNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -14,8 +14,8 @@ import java.time.Instant;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    @ExceptionHandler(EmailAlreadyPresentException.class)
-    public ResponseEntity<ErrorResponse> handleEmailAlreadyPresentException(EmailAlreadyPresentException e, HttpServletRequest request) {
+    @ExceptionHandler(ResourceAlreadyPresentException.class)
+    public ResponseEntity<ErrorResponse> handleResourceAlreadyPresentException(ResourceAlreadyPresentException e, HttpServletRequest request) {
         ErrorResponse body = new ErrorResponse(
                 Instant.now(),
                 HttpStatus.BAD_REQUEST.value(),

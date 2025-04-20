@@ -1,7 +1,7 @@
 package dev.prithwish.ledgerlux.auth;
 
 import dev.prithwish.ledgerlux.common.exception.AuthTokenExpiredException;
-import dev.prithwish.ledgerlux.common.exception.EmailAlreadyPresentException;
+import dev.prithwish.ledgerlux.common.exception.ResourceAlreadyPresentException;
 import dev.prithwish.ledgerlux.user.NotificationPreferences;
 import dev.prithwish.ledgerlux.user.User;
 import dev.prithwish.ledgerlux.user.UserRepository;
@@ -39,7 +39,7 @@ public class AuthServiceImpl implements AuthService {
     public SignUpResponse register(RegisterRequest req) {
         // Check if email already exists
         if (userRepo.findByEmail(req.email()).isPresent()) {
-            throw new EmailAlreadyPresentException("Email already in use");
+            throw new ResourceAlreadyPresentException("Email already in use");
         }
         // Create a new user entity
         User user = new User();
