@@ -3,11 +3,10 @@ package dev.prithwish.ledgerlux.recurring;
 import dev.prithwish.ledgerlux.common.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.time.*;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAdjusters;
 import java.util.Date;
 import java.util.List;
+
+import static dev.prithwish.ledgerlux.recurring.RecurrenceUtil.computeNextRun;
 
 @Service
 public class RecurringServiceImpl implements RecurringService {
@@ -62,43 +61,5 @@ public class RecurringServiceImpl implements RecurringService {
                 .filter(r -> r.getUserId().equals(userId))
                 .orElseThrow(() -> new ResourceNotFoundException("Recurring rule not found"));
         repo.delete(rt);
-    }
-
-    /**
-     * Compute the next execution datetime based on a pattern and timeOfDay.
-     */
-    private Date computeNextRun(RecurringRequest req) {
-        LocalTime time = LocalTime.parse(req.timeOfDay(), DateTimeFormatter.ofPattern("HH:mm"));
-        ZoneId zone = ZoneId.systemDefault();
-        LocalDateTime next;
-        LocalDate today = LocalDate.now(zone);
-
-        switch (req.pattern()) {
-            case "DAILY":
-                next = LocalDateTime.of(today.plusDays(1), time);
-                break;
-            case "WEEKLY":
-                DayOfWeek dow = DayOfWeek.valueOf(req.dayOfWeek());
-                LocalDate nextDate = today.with(TemporalAdjusters.nextOrSame(dow));
-                next = LocalDateTime.of(nextDate, time);
-                // if today and time already passed, move to next week
-                if (next.isBefore(LocalDateTime.now(zone))) {
-                    next = next.plusWeeks(1);
-                }
-                break;
-            case "MONTHLY":
-                int dom = req.dayOfMonth();
-                LocalDate monthDate = today.withDayOfMonth(Math.min(dom, today.lengthOfMonth()));
-                next = LocalDateTime.of(monthDate, time);
-                if (next.isBefore(LocalDateTime.now(zone))) {
-                    LocalDate nextMonth = today.plusMonths(1);
-                    int day = Math.min(dom, nextMonth.lengthOfMonth());
-                    next = LocalDateTime.of(LocalDate.of(nextMonth.getYear(), nextMonth.getMonth(), day), time);
-                }
-                break;
-            default:
-                throw new IllegalArgumentException("Unknown pattern: " + req.pattern());
-        }
-        return Date.from(next.atZone(zone).toInstant());
     }
 }
